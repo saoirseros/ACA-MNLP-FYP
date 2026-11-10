@@ -13,15 +13,16 @@ LIGHTWEIGHT_TIER = "lightweight"
 HEAVYWEIGHT_TIER = "heavyweight"
 
 TIER_REASONS = {
+    # Kept for compatibility with previously stored analyses; the live
+    # pipeline no longer routes to the baselines.
     LIGHTWEIGHT_TIER: (
-        "Context level is 'low': the message stands on its own, so the "
-        "fast TF-IDF + Logistic Regression baseline analyzes it directly "
-        "and the heavyweight Transformers are skipped entirely."
+        "Analyzed by the lightweight TF-IDF + Logistic Regression baseline "
+        "(legacy; no longer used by the live pipeline)."
     ),
     HEAVYWEIGHT_TIER: (
-        "Context level requires prior conversation turns, so the message "
-        "(with Adaptive Context Activation's selected context) is routed "
-        "to the full Transformer models for higher accuracy."
+        "Analyzed by the full Transformer models for the highest accuracy. "
+        "Adaptive Context Activation decides whether prior conversation "
+        "turns are added to the text first."
     ),
 }
 

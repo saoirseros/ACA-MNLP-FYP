@@ -19,10 +19,7 @@ from fastapi import APIRouter, HTTPException
 from app.context.composer import build_effective_text
 from app.context.scoring import score_context_requirement
 from app.context.selector import select_context_messages
-from app.context.trace import HEAVYWEIGHT_TIER, LIGHTWEIGHT_TIER, build_trace
-from app.models.baseline.emotion_baseline import analyze_emotion_baseline
-from app.models.baseline.sentiment_baseline import analyze_sentiment_baseline
-from app.models.baseline.toxicity_baseline import analyze_toxicity_baseline
+from app.context.trace import HEAVYWEIGHT_TIER, build_trace
 from app.models.emotion.model import analyze_emotion
 from app.models.sentiment.model import analyze_sentiment
 from app.models.toxicity.model import analyze_toxicity
@@ -70,16 +67,14 @@ def analyze_toxicity_endpoint(payload: TextAnalysisRequest) -> AnalyzeToxicityRe
 @router.post("/message", response_model=AnalyzeMessageResponse)
 def analyze_message_endpoint(payload: AnalyzeMessageRequest) -> AnalyzeMessageResponse:
     """
-    Run Adaptive Context Activation, then route to one tier of the model
-    cascade, on a single message:
+    Run Adaptive Context Activation, then analyze the message with the
+    heavyweight Transformers.
 
-    - context level "low" (message stands on its own): the lightweight
-      TF-IDF + Logistic Regression baseline analyzes the raw message -
-      the heavyweight Transformers are skipped entirely, so this tier is
-      genuinely cheaper, not just "the same models with less text".
-    - context level "medium"/"high" (message depends on prior turns): the
-      heavyweight Transformers analyze the message plus ACA-selected
-      context, for higher accuracy on ambiguous/context-dependent text.
+    The TF-IDF + Logistic Regression baselines (app/models/baseline/) are
+    kept in the codebase for evaluation/comparison but are intentionally
+    not used here: they were too inaccurate for live chat messages. The
+    context level only decides how much prior history is added to the text
+    the Transformers analyze (none for "low").
     """
     total_start = time.perf_counter()
     try:
@@ -89,20 +84,16 @@ def analyze_message_endpoint(payload: AnalyzeMessageRequest) -> AnalyzeMessageRe
         )
         effective_text = build_effective_text(selected_context, payload.text)
 
-        if context_result.level == "low":
-            model_tier = LIGHTWEIGHT_TIER
-            # The uncertainty signal already ran the lightweight sentiment
-            # baseline on this exact text as a side effect of ACA scoring
-            # (see app/context/scoring.py) - reuse that result instead of
-            # calling the model a second time.
-            sentiment_result = context_result.baseline_sentiment or analyze_sentiment_baseline(payload.text)
-            emotion_result = analyze_emotion_baseline(payload.text)
-            toxicity_result = analyze_toxicity_baseline(payload.text)
+        model_tier = HEAVYWEIGHT_TIER
+        # The uncertainty signal already ran the sentiment Transformer on the
+        # raw message during ACA scoring (see app/context/scoring.py); reuse
+        # it when no context was added so the model isn't called twice.
+        if effective_text == payload.text and context_result.raw_sentiment:
+            sentiment_result = context_result.raw_sentiment
         else:
-            model_tier = HEAVYWEIGHT_TIER
             sentiment_result = analyze_sentiment(effective_text)
-            emotion_result = analyze_emotion(effective_text)
-            toxicity_result = analyze_toxicity(effective_text)
+        emotion_result = analyze_emotion(effective_text)
+        toxicity_result = analyze_toxicity(effective_text)
     except Exception as exc:  # noqa: BLE001
         logger.exception("Combined message analysis failed")
         raise HTTPException(status_code=500, detail=str(exc)) from exc

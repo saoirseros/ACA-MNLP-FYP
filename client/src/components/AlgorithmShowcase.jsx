@@ -7,17 +7,17 @@ import { ChatContext } from '../../context/ChatContext'
 const EXAMPLES = [
     {
         key: 'no-context',
-        label: 'Example 1 · No context needed → lightweight model',
+        label: 'Example 1 · No context needed → message analyzed on its own',
         text: 'Thanks!',
         history: ['The weather is nice today.', 'Yes, it is sunny.'],
-        blurb: 'A reply that stands on its own. ACA should score this "low" and route it to the fast baseline, skipping the Transformers entirely.',
+        blurb: 'A reply that stands on its own. ACA should score this "low", so no history is added and the Transformers analyze the message by itself.',
     },
     {
         key: 'context-needed',
-        label: 'Example 2 · Context needed → heavyweight model',
+        label: 'Example 2 · Context needed → message analyzed with history',
         text: 'No, I meant the other results.',
         history: ['I finally got the results.', "That's great!"],
-        blurb: 'A correction that only makes sense given the prior turns. ACA should score this "medium/high", select the relevant history, and route it to the full Transformers.',
+        blurb: 'A correction that only makes sense given the prior turns. ACA should score this "medium/high", select the relevant history, and send it along with the message to the Transformers.',
     },
 ]
 
@@ -46,7 +46,7 @@ const SIGNAL_LABELS = {
     reference: 'Reference (pronouns/back-references)',
     brevity: 'Brevity (message length)',
     similarity: 'Similarity (to recent history)',
-    uncertainty: 'Uncertainty (lightweight model confidence)',
+    uncertainty: 'Uncertainty (sentiment model confidence)',
 }
 
 const PipelineVisualization = ({ input, result }) => {
@@ -118,11 +118,11 @@ const PipelineVisualization = ({ input, result }) => {
             {/* Stage 6: model tier branch */}
             <Box title='6 · Model-tier routing'>
                 <div className='flex gap-2'>
-                    <Box title='Lightweight' tone={trace.modelTier === 'lightweight' ? 'lightweight' : 'skipped'} className='flex-1'>
+                    <Box title='Baseline (not used)' tone={trace.modelTier === 'lightweight' ? 'lightweight' : 'skipped'} className='flex-1'>
                         <p className='opacity-80'>TF-IDF + Logistic Regression</p>
                         {trace.modelTier === 'lightweight' && <p className='mt-1 font-medium'>← used</p>}
                     </Box>
-                    <Box title='Heavyweight' tone={trace.modelTier === 'heavyweight' ? 'heavyweight' : 'skipped'} className='flex-1'>
+                    <Box title='Transformers' tone={trace.modelTier === 'heavyweight' ? 'heavyweight' : 'skipped'} className='flex-1'>
                         <p className='opacity-80'>Transformers (DistilBERT / DistilRoBERTa / BERT)</p>
                         {trace.modelTier === 'heavyweight' && <p className='mt-1 font-medium'>← used</p>}
                     </Box>

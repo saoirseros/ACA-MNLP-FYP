@@ -44,8 +44,8 @@ const Sidebar = () => {
         </div>
 
         {/* Entry point for the Algorithm Showcase: visualizes how Adaptive
-            Context Activation routes a message to the lightweight or
-            heavyweight model, with real example workflows. */}
+            Context Activation decides how much history each message needs,
+            with real example workflows. */}
         <button
             onClick={()=> setShowAlgorithmShowcase(true)}
             className='w-full mt-3 flex items-center justify-center gap-2 bg-[#282142] hover:bg-[#332a5c] rounded-full py-2.5 text-xs transition'
