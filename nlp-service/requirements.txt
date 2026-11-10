@@ -12,7 +12,8 @@ transformers==4.47.1
 
 # Phase 5: emotion, toxicity (Transformer classifiers, use torch/transformers
 # above), summarization (also Transformer-based), and topic extraction
-# (classic TF-IDF baseline, no Transformer needed).
+# (keyphrase extraction using stop-word chunking + the embedding model below;
+# scikit-learn supplies the English stop word list and the baseline models).
 scikit-learn==1.6.0
 
 # Phase 6: Adaptive Context Activation - a small sentence-embedding model

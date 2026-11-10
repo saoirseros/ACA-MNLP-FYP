@@ -149,7 +149,7 @@ const AnalyticsDashboard = () => {
                 <div className='flex flex-wrap gap-1'>
                     {keywords.length > 0 ? keywords.map((kw) => (
                         <span key={kw} className='text-[10px] px-2 py-0.5 rounded-full bg-violet-500/30 text-violet-100'>{kw}</span>
-                    )) : <span className='opacity-60'>Not enough conversation yet.</span>}
+                    )) : <span className='opacity-60'>No clear topic yet - keep chatting.</span>}
                 </div>
             </Card>
 
