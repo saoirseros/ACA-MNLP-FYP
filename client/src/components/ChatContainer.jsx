@@ -84,7 +84,7 @@ const ChatContainer = () => {
                         {analysis && (
                             <div className='flex flex-wrap gap-1 mt-1 justify-end'>
                                 {analysis.sentiment && (
-                                    <span className={`text-[10px] px-2 py-0.5 rounded-full ${analysis.sentiment.label === 'positive' ? 'bg-green-600/40 text-green-200' : 'bg-red-600/40 text-red-200'}`}>
+                                    <span className={`text-[10px] px-2 py-0.5 rounded-full ${analysis.sentiment.label === 'positive' ? 'bg-green-600/40 text-green-200' : analysis.sentiment.label === 'neutral' ? 'bg-gray-500/40 text-gray-200' : 'bg-red-600/40 text-red-200'}`}>
                                         {analysis.sentiment.label} ({Math.round(analysis.sentiment.confidence * 100)}%)
                                     </span>
                                 )}

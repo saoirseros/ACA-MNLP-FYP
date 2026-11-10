@@ -2,6 +2,17 @@ import unittest
 
 from app.context.scoring import score_context_requirement
 from app.context.selector import select_context_messages
+from app.context.signals import reference_signal
+
+
+class ReferenceSignalTest(unittest.TestCase):
+    def test_demonstrative_determiners_are_not_back_references(self):
+        for text in ("I absolutely love this new phone, the camera is amazing!", "That restaurant was great"):
+            self.assertEqual(reference_signal(text), 0.0, text)
+
+    def test_demonstrative_pronouns_and_pronouns_are_back_references(self):
+        for text in ("That's disappointing.", "This is terrible", "I love that!", "Thanks, that really helped me a lot!", "They rejected it."):
+            self.assertEqual(reference_signal(text), 1.0, text)
 
 
 class CanonicalContextExamplesTest(unittest.TestCase):

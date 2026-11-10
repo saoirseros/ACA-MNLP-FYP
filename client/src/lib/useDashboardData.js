@@ -30,18 +30,19 @@ export const useDashboardData = () => {
         const progression = conversationAnalytics?.sentiment?.progression || []
         return progression.map((point, index) => ({
             index: index + 1,
-            score: point.label === 'positive' ? point.confidence : -(point.confidence ?? 0),
+            score: point.label === 'positive' ? point.confidence : point.label === 'neutral' ? 0 : -(point.confidence ?? 0),
             label: point.label,
         }))
     }, [conversationAnalytics])
 
     const sentimentSplitData = useMemo(() => {
         const progression = conversationAnalytics?.sentiment?.progression || []
-        const positive = progression.filter((p) => p.label === 'positive').length
+        const count = (label) => progression.filter((p) => p.label === label).length
         return [
-            { name: 'positive', value: positive },
-            { name: 'negative', value: progression.length - positive },
-        ]
+            { name: 'positive', value: count('positive') },
+            { name: 'neutral', value: count('neutral') },
+            { name: 'negative', value: count('negative') },
+        ].filter((entry) => entry.value > 0)
     }, [conversationAnalytics])
 
     const emotionDistributionData = useMemo(() => {

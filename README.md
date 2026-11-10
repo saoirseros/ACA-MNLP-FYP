@@ -91,8 +91,8 @@ The Python service exposes focused modules as well as a combined
 
 | Module | Purpose | Current approach |
 | --- | --- | --- |
-| Sentiment | Identifies positive or negative message sentiment | DistilBERT fine-tuned on SST-2 |
-| Emotion | Detects emotions such as joy, sadness, anger, fear, disgust, surprise, and neutral | DistilRoBERTa emotion classifier |
+| Sentiment | Identifies positive, neutral or negative message sentiment | RoBERTa (`cardiffnlp/twitter-roberta-base-sentiment-latest`) |
+| Emotion | Detects emotions such as joy, sadness, anger, fear, disgust, surprise, and neutral | RoBERTa GoEmotions classifier, grouped into 7 emotions |
 | Toxicity | Flags toxic or offensive language for moderation and conversation insights | Toxic-BERT multi-label classifier |
 | Summarization | Produces a concise view of a longer conversation | BART model fine-tuned for dialogue summarization |
 | Topic extraction | Finds representative terms and themes | TF-IDF keyword extraction |

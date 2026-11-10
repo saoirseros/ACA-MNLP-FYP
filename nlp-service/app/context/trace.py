@@ -32,8 +32,8 @@ LIGHTWEIGHT_MODELS_USED = {
     "toxicity": "tfidf-logreg-toxicity",
 }
 HEAVYWEIGHT_MODELS_USED = {
-    "sentiment": "distilbert-base-uncased-finetuned-sst-2-english",
-    "emotion": "j-hartmann/emotion-english-distilroberta-base",
+    "sentiment": "cardiffnlp/twitter-roberta-base-sentiment-latest",
+    "emotion": "SamLowe/roberta-base-go_emotions",
     "toxicity": "unitary/toxic-bert",
 }
 

@@ -23,6 +23,7 @@ const TREND_THRESHOLD = 0.3;
 // directional trend - never displayed to the user as a "score".
 const signedSentimentScore = (sentiment) => {
     if (!sentiment) return 0;
+    if (sentiment.label === "neutral") return 0;
     return sentiment.label === "positive" ? sentiment.confidence : -sentiment.confidence;
 };
 

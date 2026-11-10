@@ -30,10 +30,11 @@ LOW_THRESHOLD = 0.35
 HIGH_THRESHOLD = 0.65
 
 # The sentiment Transformer is well calibrated: clear-cut text scores
-# ~0.99. Confidence at or above this ceiling is treated as "fully certain"
-# (uncertainty 0.0), while confidence near 0.5 (a coin flip) registers
-# full uncertainty (1.0).
-CONFIDENCE_CEILING = 0.95
+# ~0.95+. Confidence at or above this ceiling is treated as "fully
+# certain" (uncertainty 0.0), while confidence at chance level for a
+# 3-class model (1/3) registers full uncertainty (1.0).
+CONFIDENCE_CEILING = 0.90
+CHANCE_CONFIDENCE = 1 / 3
 
 # How many of the most recent history messages to consider at all when
 # measuring similarity/topic continuity (older messages are ignored here,
@@ -60,8 +61,8 @@ class ContextScore:
 def _uncertainty_signal(text: str) -> Tuple[float, dict]:
     """
     How uncertain the sentiment Transformer is about this message on its
-    own. Confidence near 0.5 -> high uncertainty (1.0); confidence at or
-    above CONFIDENCE_CEILING -> low uncertainty (0.0).
+    own. Confidence at chance level (1/3) -> high uncertainty (1.0);
+    confidence at or above CONFIDENCE_CEILING -> low uncertainty (0.0).
     """
     try:
         result = analyze_sentiment(text)
@@ -69,8 +70,8 @@ def _uncertainty_signal(text: str) -> Tuple[float, dict]:
     except Exception:  # noqa: BLE001 - fall back to a neutral signal, never crash scoring
         logger.exception("Sentiment model unavailable during context scoring; using neutral uncertainty")
         return 0.5, {}
-    spread = CONFIDENCE_CEILING - 0.5
-    uncertainty = max(0.0, 1.0 - abs(confidence - 0.5) / spread) if spread > 0 else 0.0
+    spread = CONFIDENCE_CEILING - CHANCE_CONFIDENCE
+    uncertainty = min(1.0, max(0.0, 1.0 - (confidence - CHANCE_CONFIDENCE) / spread))
     return uncertainty, result
 
 

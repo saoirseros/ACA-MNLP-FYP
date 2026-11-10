@@ -166,7 +166,7 @@ const ExpandedDashboard = ({ data, onClose }) => {
                     </Panel>
 
                     {/* ------- sentiment split ------- */}
-                    <Panel title='Sentiment split' subtitle='Share of positive vs negative messages' className='xl:col-span-4'>
+                    <Panel title='Sentiment split' subtitle='Share of positive, neutral and negative messages' className='xl:col-span-4'>
                         <ResponsiveContainer width='100%' height={340}>
                             <PieChart>
                                 <Pie

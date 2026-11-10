@@ -100,8 +100,8 @@ implementation per the spec - not a tuned model):
 
 | Task | Checkpoint | Notes |
 | --- | --- | --- |
-| Sentiment | `distilbert-base-uncased-finetuned-sst-2-english` | ~260MB, binary positive/negative |
-| Emotion | `j-hartmann/emotion-english-distilroberta-base` | ~330MB, 7 labels (anger, disgust, fear, joy, neutral, sadness, surprise) |
+| Sentiment | `cardiffnlp/twitter-roberta-base-sentiment-latest` | ~500MB, 3-class negative/neutral/positive, trained on chat-like text |
+| Emotion | `SamLowe/roberta-base-go_emotions` | ~500MB, 28 GoEmotions labels summed into 7 (anger, disgust, fear, joy, neutral, sadness, surprise) |
 | Toxicity | `unitary/toxic-bert` | ~420MB, multi-label (Jigsaw categories); we threshold the general "toxic" label at 0.5 |
 | Summarization | `lidiya/bart-base-samsum` | ~560MB, BART-base fine-tuned on SAMSum (dialogue summarization, not news) |
 | Topic | TF-IDF (scikit-learn) | No Transformer - a lightweight keyword-extraction baseline over the conversation's messages |

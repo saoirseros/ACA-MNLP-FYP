@@ -1,11 +1,11 @@
 """
 Lazy-loaded wrapper around a pretrained sentiment classifier.
 
-Uses distilbert-base-uncased-finetuned-sst-2-english: a small (~260MB)
-DistilBERT checkpoint fine-tuned on SST-2, producing POSITIVE/NEGATIVE
-labels with a confidence score. This is the lightweight Transformer
-baseline described in the project spec - CPU-friendly and appropriate
-for an 8GB RAM development machine.
+Uses cardiffnlp/twitter-roberta-base-sentiment-latest: a RoBERTa-base
+checkpoint fine-tuned on ~124M tweets (informal, chat-like text) that
+predicts negative / neutral / positive with a confidence score. Unlike a
+binary classifier it can say "neutral" for factual or filler messages
+("ok see you at 5") instead of forcing them to positive or negative.
 
 The model is only loaded into memory the first time analyze_sentiment()
 is called (lazy loading), and then reused for all subsequent requests
@@ -19,7 +19,7 @@ from app.utils.logging import get_logger
 
 logger = get_logger(__name__)
 
-MODEL_CHECKPOINT = "distilbert-base-uncased-finetuned-sst-2-english"
+MODEL_CHECKPOINT = "cardiffnlp/twitter-roberta-base-sentiment-latest"
 
 
 @lru_cache
@@ -29,16 +29,15 @@ def _get_pipeline():
     from transformers import pipeline
 
     logger.info("Loading sentiment model (first use): %s", MODEL_CHECKPOINT)
-    return pipeline("sentiment-analysis", model=MODEL_CHECKPOINT)
+    return pipeline("text-classification", model=MODEL_CHECKPOINT)
 
 
 def analyze_sentiment(text: str, context: Optional[list[str]] = None) -> dict:
     """
     Run sentiment analysis on `text`.
 
-    `context` is accepted now for interface stability (Adaptive Context
-    Selection lands in Phase 6) but this simple single-message classifier
-    does not yet use it.
+    `context` is accepted for interface stability but is not used: the
+    classifier scores the message itself.
     """
     classifier = _get_pipeline()
 
@@ -46,7 +45,9 @@ def analyze_sentiment(text: str, context: Optional[list[str]] = None) -> dict:
     result = classifier(text, truncation=True)[0]
     latency_ms = (time.perf_counter() - start) * 1000
 
-    label = "positive" if result["label"] == "POSITIVE" else "negative"
+    label = result["label"].lower()
+    if label not in ("positive", "neutral", "negative"):
+        label = "neutral"
 
     return {
         "sentiment": {"label": label, "confidence": round(float(result["score"]), 4)},

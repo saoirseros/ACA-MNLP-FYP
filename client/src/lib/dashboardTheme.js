@@ -9,7 +9,7 @@ export const EMOTION_COLORS = {
 }
 export const TIER_COLORS = { lightweight: '#34d399', heavyweight: '#ff3b4e' }
 export const ROUTING_COLORS = { standalone: '#34d399', 'with history': '#ff3b4e' }
-export const SENTIMENT_COLORS = { positive: '#4ade80', negative: '#ef4444' }
+export const SENTIMENT_COLORS = { positive: '#4ade80', neutral: '#9ca3af', negative: '#ef4444' }
 export const CONTEXT_COLORS = { low: '#9ca3af', medium: '#fb923c', high: '#ff3b4e' }
 
 export const AXIS_STYLE = { fontSize: 10, fill: '#c8c8c8' }
