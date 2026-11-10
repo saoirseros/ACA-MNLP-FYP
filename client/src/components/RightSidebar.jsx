@@ -79,9 +79,14 @@ const RightSidebar = () => {
             <AnalyticsDashboard key={selectedUser._id} />
         )}
 
-        <button onClick={()=> logout()} className='absolute bottom-5 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-purple-400 to-violet-600 text-white border-none text-sm font-light py-2 px-20 rounded-full cursor-pointer'>
-            Logout
-        </button>
+        {/* In normal document flow (not absolutely positioned) so it scrolls
+            away with the rest of the sidebar content instead of staying
+            pinned on top of the Media/Dashboard panels. */}
+        <div className='flex justify-center py-5'>
+            <button onClick={()=> logout()} className='bg-gradient-to-r from-purple-400 to-violet-600 text-white border-none text-sm font-light py-2 px-20 rounded-full cursor-pointer'>
+                Logout
+            </button>
+        </div>
     </div>
   )
 }
