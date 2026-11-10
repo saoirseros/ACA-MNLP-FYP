@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
     ResponsiveContainer,
     LineChart, Line,
@@ -6,18 +6,9 @@ import {
     BarChart, Bar,
     XAxis, YAxis, CartesianGrid, Tooltip, Legend,
 } from 'recharts'
-import { ChatContext } from '../../context/ChatContext'
-
-// Distinct colors per label, reused across charts so e.g. "positive" is
-// always the same color in every widget.
-const EMOTION_COLORS = {
-    joy: '#facc15', sadness: '#60a5fa', anger: '#ef4444',
-    fear: '#c084fc', surprise: '#fb923c', disgust: '#4ade80', neutral: '#9ca3af',
-}
-const TIER_COLORS = { lightweight: '#34d399', heavyweight: '#ff3b4e' }
-
-const AXIS_STYLE = { fontSize: 10, fill: '#c8c8c8' }
-const TOOLTIP_STYLE = { background: '#170a0c', border: '1px solid #3a1218', fontSize: 11 }
+import { useDashboardData } from '../lib/useDashboardData'
+import { EMOTION_COLORS, TIER_COLORS, AXIS_STYLE, TOOLTIP_STYLE } from '../lib/dashboardTheme'
+import ExpandedDashboard from './ExpandedDashboard'
 
 // A small labeled card wrapper so every widget below shares the same look.
 const Card = ({ title, subtitle, children }) => (
@@ -28,75 +19,81 @@ const Card = ({ title, subtitle, children }) => (
     </div>
 )
 
+// Dashboard title row. The three-dot button opens a small menu whose
+// "Expand" action shows the full-screen dashboard (only offered when
+// there is data to expand).
+const DashboardHeader = ({ onExpand }) => {
+    const [menuOpen, setMenuOpen] = useState(false)
+    const menuRef = useRef(null)
+
+    useEffect(() => {
+        if (!menuOpen) return
+        const closeOnOutsideClick = (e) => {
+            if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpen(false)
+        }
+        const closeOnEscape = (e) => { if (e.key === 'Escape') setMenuOpen(false) }
+        document.addEventListener('mousedown', closeOnOutsideClick)
+        document.addEventListener('keydown', closeOnEscape)
+        return () => {
+            document.removeEventListener('mousedown', closeOnOutsideClick)
+            document.removeEventListener('keydown', closeOnEscape)
+        }
+    }, [menuOpen])
+
+    return (
+        <div className='flex items-center justify-between mb-3'>
+            <p className='font-semibold text-sm tracking-wide'>ACA <span className='text-aca-red-bright'>Chat</span> · Analytics</p>
+            {onExpand && (
+                <div ref={menuRef} className='relative'>
+                    <button
+                        onClick={() => setMenuOpen((open) => !open)}
+                        aria-label='Dashboard options'
+                        aria-haspopup='menu'
+                        aria-expanded={menuOpen}
+                        className='flex flex-col items-center justify-center gap-[3px] w-7 h-7 rounded-full hover:bg-white/10 transition'
+                    >
+                        <span className='w-[3px] h-[3px] rounded-full bg-white'></span>
+                        <span className='w-[3px] h-[3px] rounded-full bg-white'></span>
+                        <span className='w-[3px] h-[3px] rounded-full bg-white'></span>
+                    </button>
+                    {menuOpen && (
+                        <div role='menu' className='absolute right-0 top-full mt-1 z-20 w-32 rounded-md border border-aca-border bg-aca-surface-2 shadow-lg py-1'>
+                            <button
+                                role='menuitem'
+                                onClick={() => { setMenuOpen(false); onExpand() }}
+                                className='w-full text-left px-3 py-2 text-xs hover:bg-aca-red/20 hover:text-aca-red-bright transition'
+                            >
+                                ⤢ Expand
+                            </button>
+                        </div>
+                    )}
+                </div>
+            )}
+        </div>
+    )
+}
+
 /**
  * Real Analytics Dashboard: every chart here is driven by
  * conversationAnalytics (server-aggregated from stored MessageAnalysis
  * documents) and the live messages/messageAnalyses already in
- * ChatContext - nothing here is mocked or hardcoded. Mounted with
- * `key={selectedUser._id}` by the parent so its local summary-timeline
- * state resets cleanly when the conversation changes.
+ * ChatContext (see useDashboardData) - nothing here is mocked or
+ * hardcoded. Mounted with `key={selectedUser._id}` by the parent so its
+ * local state (summary timeline, expanded view) resets cleanly when the
+ * conversation changes.
  */
 const AnalyticsDashboard = () => {
-    const { conversationAnalytics, messages, messageAnalyses } = useContext(ChatContext)
-    // Client-side rolling history of distinct summaries seen this session
-    // for this conversation - the NLP service only ever returns the
-    // *current* summary, so this builds an honest "then vs now" timeline
-    // out of successive real summaries rather than inventing history.
-    const [summaryTimeline, setSummaryTimeline] = useState([])
-    const lastSummaryRef = useRef(null)
+    const data = useDashboardData()
+    const [expanded, setExpanded] = useState(false)
+    const {
+        conversationAnalytics, hasData, summaryTimeline, sentimentTrendData, emotionDistributionData,
+        toxicityTimelineData, modelTierData, latencyByTier, keywords,
+    } = data
 
-    useEffect(() => {
-        const text = conversationAnalytics?.summary?.text
-        if (text && text !== lastSummaryRef.current) {
-            lastSummaryRef.current = text
-            setSummaryTimeline((prev) => [...prev, { text, at: new Date().toLocaleTimeString() }].slice(-5))
-        }
-    }, [conversationAnalytics?.summary?.text])
-
-    const sentimentTrendData = useMemo(() => {
-        const progression = conversationAnalytics?.sentiment?.progression || []
-        return progression.map((point, index) => ({
-            index: index + 1,
-            score: point.label === 'positive' ? point.confidence : -(point.confidence ?? 0),
-            label: point.label,
-        }))
-    }, [conversationAnalytics])
-
-    const emotionDistributionData = useMemo(() => {
-        const distribution = conversationAnalytics?.emotion?.distribution || {}
-        return Object.entries(distribution).map(([name, value]) => ({ name, value }))
-    }, [conversationAnalytics])
-
-    // Toxicity-over-time is derived straight from the live per-message
-    // analyses already held in ChatContext (keyed by messageId), matched
-    // back to message order - no separate backend endpoint needed.
-    const toxicityTimelineData = useMemo(() => {
-        return messages
-            .map((msg, index) => ({ msg, index, analysis: messageAnalyses[msg._id] }))
-            .filter((item) => item.analysis?.toxicity)
-            .map((item, i) => ({
-                index: i + 1,
-                toxic: item.analysis.toxicity.label === 'toxic' ? 1 : 0,
-                confidence: item.analysis.toxicity.confidence,
-            }))
-    }, [messages, messageAnalyses])
-
-    const modelTierData = useMemo(() => {
-        const counts = conversationAnalytics?.modelRouting?.tierCounts
-        if (!counts) return []
-        return [
-            { name: 'lightweight', value: counts.lightweight || 0 },
-            { name: 'heavyweight', value: counts.heavyweight || 0 },
-        ]
-    }, [conversationAnalytics])
-
-    const latencyByTier = conversationAnalytics?.modelRouting?.averageLatencyMsByTier
-    const keywords = conversationAnalytics?.topic?.keywords || []
-
-    if (!conversationAnalytics || conversationAnalytics.messagesAnalyzed === 0) {
+    if (!hasData) {
         return (
             <div className='px-5 text-xs pb-24'>
-                <p className='font-semibold text-sm mb-2 tracking-wide'>ACA <span className='text-aca-red-bright'>Chat</span> · Analytics</p>
+                <DashboardHeader />
                 <p className='opacity-70'>No analyzed messages yet - send a few messages to populate the dashboard.</p>
             </div>
         )
@@ -104,7 +101,8 @@ const AnalyticsDashboard = () => {
 
     return (
         <div className='px-5 text-xs pb-24'>
-            <p className='font-semibold text-sm mb-3 tracking-wide'>ACA <span className='text-aca-red-bright'>Chat</span> · Analytics</p>
+            <DashboardHeader onExpand={() => setExpanded(true)} />
+
             <Card title='Sentiment trend' subtitle='Signed confidence per message (+positive / -negative)'>
                 <ResponsiveContainer width='100%' height={110}>
                     <LineChart data={sentimentTrendData} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
@@ -207,6 +205,8 @@ const AnalyticsDashboard = () => {
                     </p>
                 )}
             </Card>
+
+            {expanded && <ExpandedDashboard data={data} onClose={() => setExpanded(false)} />}
         </div>
     )
 }

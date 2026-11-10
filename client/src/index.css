@@ -33,3 +33,10 @@ body {
 input::placeholder, textarea::placeholder {
   color: #8a8a90;
 }
+
+/* Recharts colors tooltip rows with the series color (black for plain
+   bars/slices), which is unreadable on the dark tooltip background. */
+.recharts-default-tooltip .recharts-tooltip-item,
+.recharts-default-tooltip .recharts-tooltip-label {
+  color: #f4f4f5 !important;
+}
