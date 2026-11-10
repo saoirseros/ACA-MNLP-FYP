@@ -72,9 +72,13 @@ def analyze_message_endpoint(payload: AnalyzeMessageRequest) -> AnalyzeMessageRe
 
     The TF-IDF + Logistic Regression baselines (app/models/baseline/) are
     kept in the codebase for evaluation/comparison but are intentionally
-    not used here: they were too inaccurate for live chat messages. The
-    context level only decides how much prior history is added to the text
-    the Transformers analyze (none for "low").
+    not used here: they were too inaccurate for live chat messages.
+
+    ACA still scores how much context the message needs and selects the
+    relevant history (returned in the trace and tags), but the sentiment,
+    emotion and toxicity labels are computed from the message itself:
+    prepending earlier turns made the classifiers inherit the tone of
+    those turns (e.g. "Thanks!" labelled angry after an angry message).
     """
     total_start = time.perf_counter()
     try:
@@ -85,22 +89,19 @@ def analyze_message_endpoint(payload: AnalyzeMessageRequest) -> AnalyzeMessageRe
         effective_text = build_effective_text(selected_context, payload.text)
 
         model_tier = HEAVYWEIGHT_TIER
-        # The uncertainty signal already ran the sentiment Transformer on the
-        # raw message during ACA scoring (see app/context/scoring.py); reuse
-        # it when no context was added so the model isn't called twice.
-        if effective_text == payload.text and context_result.raw_sentiment:
-            sentiment_result = context_result.raw_sentiment
-        else:
-            sentiment_result = analyze_sentiment(effective_text)
-        emotion_result = analyze_emotion(effective_text)
-        toxicity_result = analyze_toxicity(effective_text)
+        # The uncertainty signal already ran the sentiment Transformer on
+        # this exact text during ACA scoring (see app/context/scoring.py),
+        # so reuse it instead of calling the model a second time.
+        sentiment_result = context_result.raw_sentiment or analyze_sentiment(payload.text)
+        emotion_result = analyze_emotion(payload.text)
+        toxicity_result = analyze_toxicity(payload.text)
     except Exception as exc:  # noqa: BLE001
         logger.exception("Combined message analysis failed")
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
     total_latency_ms = (time.perf_counter() - total_start) * 1000
 
-    trace = build_trace(context_result, effective_text, model_tier)
+    trace = build_trace(context_result, effective_text, model_tier, analyzed_text=payload.text)
 
     return AnalyzeMessageResponse(
         sentiment=sentiment_result["sentiment"],

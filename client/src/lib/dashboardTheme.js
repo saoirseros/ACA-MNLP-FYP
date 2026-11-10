@@ -8,6 +8,7 @@ export const EMOTION_COLORS = {
     fear: '#c084fc', surprise: '#fb923c', disgust: '#4ade80', neutral: '#9ca3af',
 }
 export const TIER_COLORS = { lightweight: '#34d399', heavyweight: '#ff3b4e' }
+export const ROUTING_COLORS = { standalone: '#34d399', 'with history': '#ff3b4e' }
 export const SENTIMENT_COLORS = { positive: '#4ade80', negative: '#ef4444' }
 export const CONTEXT_COLORS = { low: '#9ca3af', medium: '#fb923c', high: '#ff3b4e' }
 

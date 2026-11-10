@@ -63,12 +63,12 @@ export const useDashboardData = () => {
             }))
     }, [messages, messageAnalyses])
 
-    const modelTierData = useMemo(() => {
-        const counts = conversationAnalytics?.modelRouting?.tierCounts
+    const contextRoutingData = useMemo(() => {
+        const counts = conversationAnalytics?.contextRouting?.counts
         if (!counts) return []
         return [
-            { name: 'lightweight', value: counts.lightweight || 0 },
-            { name: 'heavyweight', value: counts.heavyweight || 0 },
+            { name: 'standalone', value: counts.standalone || 0 },
+            { name: 'with history', value: counts.withHistory || 0 },
         ]
     }, [conversationAnalytics])
 
@@ -86,9 +86,9 @@ export const useDashboardData = () => {
         sentimentSplitData,
         emotionDistributionData,
         toxicityTimelineData,
-        modelTierData,
+        contextRoutingData,
         contextLevelData,
-        latencyByTier: conversationAnalytics?.modelRouting?.averageLatencyMsByTier,
+        contextLatency: conversationAnalytics?.contextRouting?.averageLatencyMs,
         keywords: conversationAnalytics?.topic?.keywords || [],
     }
 }

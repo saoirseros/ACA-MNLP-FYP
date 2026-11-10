@@ -7,17 +7,17 @@ import { ChatContext } from '../../context/ChatContext'
 const EXAMPLES = [
     {
         key: 'no-context',
-        label: 'Example 1 · No context needed → message analyzed on its own',
+        label: 'Example 1 · No context needed → no history selected',
         text: 'Thanks!',
         history: ['The weather is nice today.', 'Yes, it is sunny.'],
-        blurb: 'A reply that stands on its own. ACA should score this "low", so no history is added and the Transformers analyze the message by itself.',
+        blurb: 'A reply that stands on its own. ACA should score this "low", so no history is selected for it.',
     },
     {
         key: 'context-needed',
-        label: 'Example 2 · Context needed → message analyzed with history',
+        label: 'Example 2 · Context needed → history selected',
         text: 'No, I meant the other results.',
         history: ['I finally got the results.', "That's great!"],
-        blurb: 'A correction that only makes sense given the prior turns. ACA should score this "medium/high", select the relevant history, and send it along with the message to the Transformers.',
+        blurb: 'A correction that only makes sense given the prior turns. ACA should score this "medium/high" and select the relevant history.',
     },
 ]
 
@@ -110,8 +110,14 @@ const PipelineVisualization = ({ input, result }) => {
                 </>
             )}
 
-            <Box title='5 · Effective text sent to the model'>
-                <p className='opacity-90 whitespace-pre-line'>{trace.effectiveText}</p>
+            <Box title='5 · Text classified by the Transformers'>
+                <p className='opacity-90 whitespace-pre-line'>{trace.analyzedText || trace.effectiveText}</p>
+                {trace.effectiveText && trace.analyzedText && trace.effectiveText !== trace.analyzedText && (
+                    <>
+                        <p className='text-gray-400 mt-2'>ACA-composed context (selected history + message), not used for the labels:</p>
+                        <p className='opacity-70 whitespace-pre-line'>{trace.effectiveText}</p>
+                    </>
+                )}
             </Box>
             <StageArrow />
 

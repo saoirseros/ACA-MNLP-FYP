@@ -101,7 +101,7 @@ const ChatContainer = () => {
                                 {analysis.contextLevel && (
                                     <span
                                         className='text-[10px] px-2 py-0.5 rounded-full bg-gray-600/40 text-gray-300'
-                                        title={`Adaptive Context Activation: ${analysis.selectedContextMessages ?? 0} prior message(s) used`}
+                                        title={`Adaptive Context Activation: ${analysis.selectedContextMessages ?? 0} prior message(s) selected`}
                                     >
                                         ctx: {analysis.contextLevel}{analysis.selectedContextMessages ? ` (${analysis.selectedContextMessages})` : ''}
                                     </span>
@@ -111,7 +111,7 @@ const ChatContainer = () => {
                                         className={`text-[10px] px-2 py-0.5 rounded-full ${analysis.modelTier === 'lightweight' ? 'bg-emerald-600/40 text-emerald-200' : 'bg-aca-red/30 text-red-200'}`}
                                         title={analysis.trace?.tierReason || `Analyzed by the ${analysis.modelTier} model`}
                                     >
-                                        {analysis.modelTier === 'lightweight' ? '⚡ lightweight' : '🧠 heavyweight'}
+                                        {analysis.modelTier === 'lightweight' ? '⚡ baseline (legacy)' : '🧠 transformer'}
                                     </span>
                                 )}
                             </div>

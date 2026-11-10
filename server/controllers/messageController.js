@@ -1,4 +1,5 @@
 import Message from "../models/Message.js";
+import MessageAnalysis from "../models/MessageAnalysis.js";
 import User from "../models/User.js";
 import cloudinary from "../lib/cloudinary.js"
 import { io, userSocketMap } from "../server.js";
@@ -41,7 +42,14 @@ export const getMessages = async (req, res) =>{
         })
         await Message.updateMany({senderId: selectedUserId, receiverId: myId}, {seen: true});
 
-        res.json({success: true, messages})
+        // Stored NLP analyses so tags are still shown on older messages
+        // after a reload (new ones arrive live over the socket).
+        const analyses = await MessageAnalysis.find({
+            messageId: { $in: messages.map((m) => m._id) },
+            status: "completed",
+        }).select("-trace").lean();
+
+        res.json({success: true, messages, analyses})
 
 
     } catch (error) {

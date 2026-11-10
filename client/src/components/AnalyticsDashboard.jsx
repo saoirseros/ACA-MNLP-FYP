@@ -7,7 +7,7 @@ import {
     XAxis, YAxis, CartesianGrid, Tooltip, Legend,
 } from 'recharts'
 import { useDashboardData } from '../lib/useDashboardData'
-import { EMOTION_COLORS, TIER_COLORS, AXIS_STYLE, TOOLTIP_STYLE } from '../lib/dashboardTheme'
+import { EMOTION_COLORS, ROUTING_COLORS, AXIS_STYLE, TOOLTIP_STYLE } from '../lib/dashboardTheme'
 import ExpandedDashboard from './ExpandedDashboard'
 
 // A small labeled card wrapper so every widget below shares the same look.
@@ -87,7 +87,7 @@ const AnalyticsDashboard = () => {
     const [expanded, setExpanded] = useState(false)
     const {
         conversationAnalytics, hasData, summaryTimeline, sentimentTrendData, emotionDistributionData,
-        toxicityTimelineData, modelTierData, latencyByTier, keywords,
+        toxicityTimelineData, contextRoutingData, contextLatency, keywords,
     } = data
 
     if (!hasData) {
@@ -154,25 +154,25 @@ const AnalyticsDashboard = () => {
                 </div>
             </Card>
 
-            {modelTierData.some((d) => d.value > 0) && (
-                <Card title='Model routing (ACA cascade)' subtitle='Lightweight (no context) vs heavyweight (context-dependent)'>
+            {contextRoutingData.some((d) => d.value > 0) && (
+                <Card title='Context routing (ACA)' subtitle='All messages use the Transformer models; ACA decides whether history is added'>
                     <ResponsiveContainer width='100%' height={110}>
-                        <BarChart data={modelTierData} layout='vertical' margin={{ top: 4, right: 16, left: 8, bottom: 0 }}>
+                        <BarChart data={contextRoutingData} layout='vertical' margin={{ top: 4, right: 16, left: 8, bottom: 0 }}>
                             <CartesianGrid strokeDasharray='3 3' stroke='#ffffff20' />
                             <XAxis type='number' tick={AXIS_STYLE} allowDecimals={false} />
                             <YAxis type='category' dataKey='name' tick={AXIS_STYLE} width={70} />
                             <Tooltip contentStyle={TOOLTIP_STYLE} />
                             <Bar dataKey='value' radius={[0, 3, 3, 0]}>
-                                {modelTierData.map((entry) => (
-                                    <Cell key={entry.name} fill={TIER_COLORS[entry.name]} />
+                                {contextRoutingData.map((entry) => (
+                                    <Cell key={entry.name} fill={ROUTING_COLORS[entry.name]} />
                                 ))}
                             </Bar>
                         </BarChart>
                     </ResponsiveContainer>
-                    {latencyByTier && (latencyByTier.lightweight != null || latencyByTier.heavyweight != null) && (
+                    {contextLatency && (contextLatency.standalone != null || contextLatency.withHistory != null) && (
                         <p className='opacity-80 mt-1'>
-                            Avg. latency - lightweight: {latencyByTier.lightweight != null ? `${Math.round(latencyByTier.lightweight)}ms` : 'n/a'}
-                            {' · '}heavyweight: {latencyByTier.heavyweight != null ? `${Math.round(latencyByTier.heavyweight)}ms` : 'n/a'}
+                            Avg. latency - standalone: {contextLatency.standalone != null ? `${Math.round(contextLatency.standalone)}ms` : 'n/a'}
+                            {' · '}with history: {contextLatency.withHistory != null ? `${Math.round(contextLatency.withHistory)}ms` : 'n/a'}
                         </p>
                     )}
                 </Card>

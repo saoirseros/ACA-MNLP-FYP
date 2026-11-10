@@ -42,6 +42,12 @@ export const ChatProvider = ({ children })=>{
             const { data } = await axios.get(`/api/messages/${userId}`);
             if (data.success){
                 setMessages(data.messages)
+                if (data.analyses?.length) {
+                    setMessageAnalyses((prevAnalyses) => ({
+                        ...prevAnalyses,
+                        ...Object.fromEntries(data.analyses.map((analysis) => [analysis.messageId, analysis])),
+                    }))
+                }
             }
         } catch (error) {
             toast.error(error.message)

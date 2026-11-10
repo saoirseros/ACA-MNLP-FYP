@@ -90,6 +90,7 @@ class AnalysisTrace(BaseModel):
     contextLevel: str
     candidateHistory: list[CandidateHistoryItem]
     effectiveText: str
+    analyzedText: str = ""
     modelTier: str
     tierReason: str
     modelsUsed: dict[str, str]

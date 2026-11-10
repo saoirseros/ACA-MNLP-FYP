@@ -9,7 +9,7 @@ import {
 import { ChatContext } from '../../context/ChatContext'
 import assets from '../assets/assets'
 import {
-    EMOTION_COLORS, TIER_COLORS, SENTIMENT_COLORS, CONTEXT_COLORS,
+    EMOTION_COLORS, ROUTING_COLORS, SENTIMENT_COLORS, CONTEXT_COLORS,
     AXIS_STYLE_LARGE, TOOLTIP_STYLE_LARGE,
 } from '../lib/dashboardTheme'
 
@@ -51,7 +51,7 @@ const ExpandedDashboard = ({ data, onClose }) => {
     const {
         conversationAnalytics: analytics,
         summaryTimeline, sentimentTrendData, sentimentSplitData, emotionDistributionData,
-        toxicityTimelineData, modelTierData, contextLevelData, latencyByTier, keywords,
+        toxicityTimelineData, contextRoutingData, contextLevelData, contextLatency, keywords,
     } = data
 
     useEffect(() => {
@@ -66,7 +66,7 @@ const ExpandedDashboard = ({ data, onClose }) => {
     }, [onClose])
 
     const emotionBarData = [...emotionDistributionData].sort((a, b) => b.value - a.value)
-    const hasTierData = modelTierData.some((d) => d.value > 0)
+    const hasRoutingData = contextRoutingData.some((d) => d.value > 0)
 
     return (
         <div
@@ -267,21 +267,21 @@ const ExpandedDashboard = ({ data, onClose }) => {
                     </Panel>
 
                     {/* ------- model routing ------- */}
-                    {hasTierData && (
+                    {hasRoutingData && (
                         <Panel
-                            title='Model routing'
-                            subtitle={`Avg. latency - lightweight: ${ms(latencyByTier?.lightweight)} · heavyweight: ${ms(latencyByTier?.heavyweight)}`}
+                            title='Context routing (ACA)'
+                            subtitle={`All messages use the Transformer models · Avg. latency - standalone: ${ms(contextLatency?.standalone)} · with history: ${ms(contextLatency?.withHistory)}`}
                             className='xl:col-span-6'
                         >
                             <ResponsiveContainer width='100%' height={220}>
-                                <BarChart data={modelTierData} layout='vertical' margin={{ top: 4, right: 30, left: 10, bottom: 0 }}>
+                                <BarChart data={contextRoutingData} layout='vertical' margin={{ top: 4, right: 30, left: 10, bottom: 0 }}>
                                     <CartesianGrid strokeDasharray='3 3' stroke={GRID_STROKE} />
                                     <XAxis type='number' tick={AXIS_STYLE_LARGE} allowDecimals={false} />
                                     <YAxis type='category' dataKey='name' tick={AXIS_STYLE_LARGE} width={95} />
                                     <Tooltip contentStyle={TOOLTIP_STYLE_LARGE} cursor={{ fill: '#ffffff10' }} />
                                     <Bar dataKey='value' radius={[0, 6, 6, 0]}>
-                                        {modelTierData.map((entry) => (
-                                            <Cell key={entry.name} fill={TIER_COLORS[entry.name]} />
+                                        {contextRoutingData.map((entry) => (
+                                            <Cell key={entry.name} fill={ROUTING_COLORS[entry.name]} />
                                         ))}
                                         <LabelList dataKey='value' position='right' fill='#f4f4f5' fontSize={12} />
                                     </Bar>
@@ -294,7 +294,7 @@ const ExpandedDashboard = ({ data, onClose }) => {
                     <Panel
                         title='Topic keywords'
                         subtitle={analytics.topic?.label ? `Top topic: ${analytics.topic.label}` : undefined}
-                        className={hasTierData ? 'xl:col-span-6' : 'xl:col-span-12'}
+                        className={hasRoutingData ? 'xl:col-span-6' : 'xl:col-span-12'}
                     >
                         <div className='flex flex-wrap gap-2'>
                             {keywords.length > 0 ? keywords.map((kw, i) => (

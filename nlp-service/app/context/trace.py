@@ -21,8 +21,8 @@ TIER_REASONS = {
     ),
     HEAVYWEIGHT_TIER: (
         "Analyzed by the full Transformer models for the highest accuracy. "
-        "Adaptive Context Activation decides whether prior conversation "
-        "turns are added to the text first."
+        "Adaptive Context Activation scores how much history the message "
+        "needs and selects it, but the labels come from the message itself."
     ),
 }
 
@@ -42,6 +42,7 @@ def build_trace(
     context_result: ContextScore,
     effective_text: str,
     model_tier: str,
+    analyzed_text: str,
 ) -> dict:
     signals = [
         {
@@ -71,6 +72,7 @@ def build_trace(
         "contextLevel": context_result.level,
         "candidateHistory": candidate_history,
         "effectiveText": effective_text,
+        "analyzedText": analyzed_text,
         "modelTier": model_tier,
         "tierReason": TIER_REASONS[model_tier],
         "modelsUsed": models_used,

@@ -85,6 +85,11 @@ export const getConversationAnalytics = async (myId, otherUserId) => {
     const contextLevelCounts = { low: 0, medium: 0, high: 0 };
     const modelTierCounts = { lightweight: 0, heavyweight: 0 };
     const latenciesByTier = { lightweight: [], heavyweight: [] };
+    // Every message is analyzed by the Transformer models; what differs is
+    // whether Adaptive Context Activation found it standalone (low context
+    // requirement: analyzed on its own) or added conversation history.
+    const contextRouting = { standalone: 0, withHistory: 0 };
+    const latenciesByContextMode = { standalone: [], withHistory: [] };
     analyses.forEach((a) => {
         if (a.contextLevel && contextLevelCounts[a.contextLevel] !== undefined) {
             contextLevelCounts[a.contextLevel] += 1;
@@ -93,6 +98,13 @@ export const getConversationAnalytics = async (myId, otherUserId) => {
         modelTierCounts[tier] += 1;
         if (typeof a.totalLatencyMs === "number") {
             latenciesByTier[tier].push(a.totalLatencyMs);
+        }
+        if (a.contextLevel) {
+            const mode = a.contextLevel === "low" ? "standalone" : "withHistory";
+            contextRouting[mode] += 1;
+            if (typeof a.totalLatencyMs === "number") {
+                latenciesByContextMode[mode].push(a.totalLatencyMs);
+            }
         }
     });
     const contextScores = analyses.map((a) => a.contextScore).filter((v) => typeof v === "number");
@@ -156,15 +168,22 @@ export const getConversationAnalytics = async (myId, otherUserId) => {
             averageScore: average(contextScores),
             averageSelectedMessages: average(selectedContextCounts),
         },
-        // Model-tier cascade (Phase 10) breakdown: how many messages were
-        // handled by the fast lightweight baseline vs. the heavyweight
-        // Transformers, and the measured latency difference between them -
-        // real, live evidence of the cascade's compute savings.
+        // Legacy tier breakdown, kept for previously stored analyses; new
+        // messages are always handled by the heavyweight Transformers.
         modelRouting: {
             tierCounts: modelTierCounts,
             averageLatencyMsByTier: {
                 lightweight: average(latenciesByTier.lightweight),
                 heavyweight: average(latenciesByTier.heavyweight),
+            },
+        },
+        // How ACA routed context: standalone messages vs messages analyzed
+        // together with selected conversation history (both Transformer).
+        contextRouting: {
+            counts: contextRouting,
+            averageLatencyMs: {
+                standalone: average(latenciesByContextMode.standalone),
+                withHistory: average(latenciesByContextMode.withHistory),
             },
         },
         processing: {
