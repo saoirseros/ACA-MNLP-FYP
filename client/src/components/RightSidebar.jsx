@@ -29,7 +29,7 @@ const RightSidebar = () => {
     }
 
   return selectedUser && (
-    <div className={`bg-[#8185B2]/10 text-white w-full relative overflow-y-scroll ${selectedUser ? "max-md:hidden" : ""}`}>
+    <div className={`bg-black/60 border-l border-aca-border text-white w-full relative overflow-y-scroll ${selectedUser ? "max-md:hidden" : ""}`}>
 
         <div className='pt-16 flex flex-col items-center gap-2 text-xs font-light mx-auto'>
             <img src={selectedUser?.profilePic || assets.avatar_icon} alt=""
@@ -41,7 +41,7 @@ const RightSidebar = () => {
             <p className='px-10 mx-auto'>{selectedUser.bio}</p>
         </div>
 
-        <hr className="border-[#ffffff50] my-4"/>
+        <hr className="border-aca-border my-4"/>
 
         {/* Media / Dashboard tab switcher - the Dashboard tab shows the
             real, live analytics of every NLP module run on this
@@ -50,13 +50,13 @@ const RightSidebar = () => {
         <div className='px-5 flex gap-2 text-xs mb-2'>
             <button
                 onClick={()=> setActiveTab('media')}
-                className={`flex-1 py-1.5 rounded-full transition ${activeTab === 'media' ? 'bg-violet-500/40 text-white' : 'bg-white/5 text-gray-400'}`}
+                className={`flex-1 py-1.5 rounded-full transition ${activeTab === 'media' ? 'bg-aca-red text-white' : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}
             >
                 Media
             </button>
             <button
                 onClick={()=> setActiveTab('dashboard')}
-                className={`flex-1 py-1.5 rounded-full transition ${activeTab === 'dashboard' ? 'bg-violet-500/40 text-white' : 'bg-white/5 text-gray-400'}`}
+                className={`flex-1 py-1.5 rounded-full transition ${activeTab === 'dashboard' ? 'bg-aca-red text-white' : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}
             >
                 📊 Dashboard
             </button>
@@ -83,7 +83,7 @@ const RightSidebar = () => {
             away with the rest of the sidebar content instead of staying
             pinned on top of the Media/Dashboard panels. */}
         <div className='flex justify-center py-5'>
-            <button onClick={()=> logout()} className='bg-gradient-to-r from-purple-400 to-violet-600 text-white border-none text-sm font-light py-2 px-20 rounded-full cursor-pointer'>
+            <button onClick={()=> logout()} className='bg-gradient-to-r from-aca-red-bright to-aca-red-deep text-white border-none text-sm font-light py-2 px-20 rounded-full cursor-pointer'>
                 Logout
             </button>
         </div>

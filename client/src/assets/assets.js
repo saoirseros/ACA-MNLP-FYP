@@ -14,7 +14,7 @@ import send_button from './send_button.svg'
 import menu_icon from './menu_icon.png'
 import arrow_icon from './arrow_icon.png'
 import code from './code.svg'
-import bgImg from './bgImg.svg'
+import bgStreaks from './bg_streaks.svg'
 import pic1 from './pic1.png'
 import pic2 from './pic2.png'
 import pic3 from './pic3.png'
@@ -34,7 +34,7 @@ const assets = {
     menu_icon,
     arrow_icon,
     code,
-    bgImg,
+    bgStreaks,
     profile_martin
 }
 
@@ -48,35 +48,35 @@ export const userDummyData = [
         "email": "test1@greatstack.dev",
         "fullName": "Alison Martin",
         "profilePic": profile_alison,
-        "bio": "Hi Everyone, I am Using QVerse",
+        "bio": "Hi Everyone, I am Using ACA Chat",
     },
     {
         "_id": "680f50e4f10f3cd28382ecf9",
         "email": "test2@greatstack.dev",
         "fullName": "Martin Johnson",
         "profilePic": profile_martin,
-        "bio": "Hi Everyone, I am Using QVerse",
+        "bio": "Hi Everyone, I am Using ACA Chat",
     },
     {
         "_id": "680f510af10f3cd28382ed01",
         "email": "test3@greatstack.dev",
         "fullName": "Enrique Martinez",
         "profilePic": profile_enrique,
-        "bio": "Hi Everyone, I am Using QVerse",
+        "bio": "Hi Everyone, I am Using ACA Chat",
     },
     {
         "_id": "680f5137f10f3cd28382ed10",
         "email": "test4@greatstack.dev",
         "fullName": "Marco Jones",
         "profilePic": profile_marco,
-        "bio": "Hi Everyone, I am Using QVerse",
+        "bio": "Hi Everyone, I am Using ACA Chat",
     },
     {
         "_id": "680f516cf10f3cd28382ed11",
         "email": "test5@greatstack.dev",
         "fullName": "Richard Smith",
         "profilePic": profile_richard,
-        "bio": "Hi Everyone, I am Using QVerse",
+        "bio": "Hi Everyone, I am Using ACA Chat",
     }
 ]
 

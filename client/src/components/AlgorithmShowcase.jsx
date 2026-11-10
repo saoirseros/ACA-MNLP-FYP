@@ -22,7 +22,7 @@ const EXAMPLES = [
 ]
 
 const StageArrow = () => (
-    <div className='flex justify-center text-violet-300 text-lg leading-none my-1'>↓</div>
+    <div className='flex justify-center text-aca-red-bright text-lg leading-none my-1'>↓</div>
 )
 
 const Box = ({ title, children, tone = 'default', className = '' }) => {
@@ -31,8 +31,8 @@ const Box = ({ title, children, tone = 'default', className = '' }) => {
         selected: 'border-emerald-400/60 bg-emerald-500/10',
         skipped: 'border-white/10 bg-white/[0.02] opacity-50',
         lightweight: 'border-emerald-400/60 bg-emerald-500/10',
-        heavyweight: 'border-indigo-400/60 bg-indigo-500/10',
-        highlight: 'border-violet-400/60 bg-violet-500/10',
+        heavyweight: 'border-aca-red/60 bg-aca-red/10',
+        highlight: 'border-aca-red-bright/60 bg-aca-red/10',
     }
     return (
         <div className={`rounded-lg border px-3 py-2 text-xs ${tones[tone]} ${className}`}>
@@ -188,7 +188,7 @@ const AlgorithmShowcase = ({ onClose }) => {
 
     return (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4'>
-            <div className='bg-[#1a1530] border border-white/10 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto text-white p-5'>
+            <div className='bg-aca-surface border border-aca-border rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto text-white p-5 shadow-[0_0_40px_rgba(225,29,46,0.2)]'>
                 <div className='flex items-center justify-between mb-3'>
                     <h2 className='text-lg font-medium'>🧭 Algorithm Showcase - Adaptive Context Activation</h2>
                     <button onClick={onClose} className='text-gray-400 hover:text-white text-xl leading-none'>×</button>
@@ -236,7 +236,7 @@ const AlgorithmShowcase = ({ onClose }) => {
                     <button
                         type='submit'
                         disabled={loading || !customText.trim()}
-                        className='self-start bg-violet-500/40 hover:bg-violet-500/60 rounded-full px-4 py-1.5 text-xs disabled:opacity-50'
+                        className='self-start bg-aca-red hover:bg-aca-red-bright rounded-full px-4 py-1.5 text-xs disabled:opacity-50'
                     >
                         Run through ACA →
                     </button>

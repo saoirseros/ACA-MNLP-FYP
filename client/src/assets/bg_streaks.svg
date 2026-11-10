@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="fadeA" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#e11d2e" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#ff3b4e" stop-opacity="0.95"/>
+      <stop offset="1" stop-color="#e11d2e" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="fadeB" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8f0f1c" stop-opacity="0"/>
+      <stop offset="0.55" stop-color="#e11d2e" stop-opacity="0.8"/>
+      <stop offset="1" stop-color="#8f0f1c" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="vignette" cx="0.5" cy="0.5" r="0.75">
+      <stop offset="0.5" stop-color="#050505" stop-opacity="0"/>
+      <stop offset="1" stop-color="#050505" stop-opacity="0.8"/>
+    </radialGradient>
+    <filter id="glow" x="-20%" y="-400%" width="140%" height="900%">
+      <feGaussianBlur stdDeviation="7"/>
+    </filter>
+  </defs>
+
+  <rect width="1920" height="1080" fill="#050505"/>
+
+  <g transform="rotate(-24 960 540)">
+    <g filter="url(#glow)" opacity="0.7">
+      <rect x="-300" y="255" width="1800" height="10" rx="5" fill="url(#fadeA)"/>
+      <rect x="300" y="463" width="1900" height="14" rx="7" fill="url(#fadeB)"/>
+      <rect x="-100" y="696" width="1400" height="8" rx="4" fill="url(#fadeA)"/>
+      <rect x="700" y="874" width="1600" height="12" rx="6" fill="url(#fadeB)"/>
+    </g>
+    <rect x="-300" y="258.75" width="1800" height="2.5" rx="1.25" fill="url(#fadeA)"/>
+    <rect x="300" y="468.5" width="1900" height="3" rx="1.5" fill="url(#fadeB)"/>
+    <rect x="-100" y="699" width="1400" height="2" rx="1" fill="url(#fadeA)"/>
+    <rect x="700" y="878.75" width="1600" height="2.5" rx="1.25" fill="url(#fadeB)"/>
+    <rect x="100" y="359.4" width="800" height="1.2" rx="0.6" fill="url(#fadeB)" opacity="0.7"/>
+    <rect x="900" y="579.4" width="1200" height="1.2" rx="0.6" fill="url(#fadeA)" opacity="0.7"/>
+    <rect x="-200" y="799.5" width="900" height="1" rx="0.5" fill="url(#fadeB)" opacity="0.6"/>
+  </g>
+
+  <rect width="1920" height="1080" fill="url(#vignette)"/>
+</svg>
