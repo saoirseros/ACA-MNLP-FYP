@@ -15,6 +15,8 @@ const ChatContainer = () => {
     const scrollEnd = useRef()
 
     const [input, setInput] = useState('');
+    const [showAnalysisTags, setShowAnalysisTags] = useState(true);
+    const [isTagOptionsOpen, setIsTagOptionsOpen] = useState(false);
 
     // Handle sending a message
     const handleSendMessage = async (e)=>{
@@ -56,14 +58,37 @@ const ChatContainer = () => {
   return selectedUser ? (
     <div className='h-full overflow-scroll relative bg-black/40'>
       {/* ------- header ------- */}
-      <div className='flex items-center gap-3 py-3 mx-4 border-b border-aca-border'>
+      <div className='relative flex items-center gap-3 py-3 mx-4 border-b border-aca-border'>
         <img src={selectedUser.profilePic || assets.avatar_icon} alt="" className="w-8 rounded-full"/>
         <p className='flex-1 text-lg text-white flex items-center gap-2'>
             {selectedUser.fullName}
             {onlineUsers.includes(selectedUser._id) && <span className="w-2 h-2 rounded-full bg-green-500"></span>}
         </p>
         <img onClick={()=> setSelectedUser(null)} src={assets.arrow_icon} alt="" className='md:hidden max-w-7'/>
-        <img src={assets.help_icon} alt="" className='max-md:hidden max-w-5'/>
+        <div className='relative max-md:hidden'>
+          <button
+            type='button'
+            onClick={() => setIsTagOptionsOpen((open) => !open)}
+            aria-label='Chat display options'
+            aria-expanded={isTagOptionsOpen}
+            className='flex items-center justify-center rounded-full p-1 hover:bg-white/10'
+          >
+            <img src={assets.help_icon} alt="" className='max-w-5'/>
+          </button>
+          {isTagOptionsOpen && (
+            <div className='absolute right-0 top-full z-20 mt-2 min-w-48 rounded-lg border border-aca-border bg-aca-surface-2 p-3 shadow-xl'>
+              <label className='flex cursor-pointer items-center justify-between gap-4 text-sm text-white'>
+                Show message tags
+                <input
+                  type='checkbox'
+                  checked={showAnalysisTags}
+                  onChange={(event) => setShowAnalysisTags(event.target.checked)}
+                  className='accent-aca-red'
+                />
+              </label>
+            </div>
+          )}
+        </div>
       </div>
       {nlpAvailable === false && (
         <div className='mx-4 mt-2 rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-200'>
@@ -81,7 +106,7 @@ const ChatContainer = () => {
                 ):(
                     <div className={`flex flex-col mb-8 max-w-[75%] md:max-w-[60%] ${msg.senderId === authUser._id ? 'items-end' : 'items-start'}`}>
                         <p className={`px-3 py-2 md:text-sm font-light rounded-lg break-words text-white ${msg.senderId === authUser._id ? 'rounded-br-none bg-aca-red/40 border border-aca-red/40' : 'rounded-bl-none bg-white/10 border border-white/10'}`}>{msg.text}</p>
-                        {analysis && (
+                        {analysis && showAnalysisTags && (
                             <div className='flex flex-wrap gap-1 mt-1 justify-end'>
                                 {analysis.sentiment && (
                                     <span className={`text-[10px] px-2 py-0.5 rounded-full ${analysis.sentiment.label === 'positive' ? 'bg-green-600/40 text-green-200' : analysis.sentiment.label === 'neutral' ? 'bg-gray-500/40 text-gray-200' : 'bg-red-600/40 text-red-200'}`}>
