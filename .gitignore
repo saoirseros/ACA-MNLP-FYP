@@ -28,6 +28,4 @@ dist-ssr
 !.env.example
 node_modules/
 
-
-ShrutiResearchPaper.docx
-ShrutiResearchPaper_v2_VisualAnalytics.docx
+paper_figures
